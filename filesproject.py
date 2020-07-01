@@ -1,6 +1,7 @@
 import docx
 import openpyxl
 
+
 class WordTemplate:
     """Open template file and initializating all table's cells content
     for next activity"""
@@ -10,6 +11,8 @@ class WordTemplate:
         self.doc = docx.Document(self.filename)
         self.offer_num = self.doc.tables[1].rows[0].cells[0]
         self.customer_name = self.doc.tables[1].rows[0].cells[2]
+        self.main_table = self.doc.tables[2]
+        self.rows = 0
         self.offer_head = self.doc.tables[2].rows[0]
         self.pos_head = self.offer_head.cells[0].text
         self.name_head = self.offer_head.cells[1].text
@@ -27,16 +30,14 @@ class WordTemplate:
         self.offer_num.text = offer_num
         self.customer_name.text = customer_name
 
-
-    def create_prices(self, price= "(без НДС), евро",total='(без НДС), евро'):
+    def create_prices(self, price="(без НДС), евро", total='(без НДС), евро'):
         """
         Filling head of table
         :param price: str
         :param total: str
         """
-        self.price_head.text = 'Цена '+ price
+        self.price_head.text = 'Цена ' + price
         self.total_head = 'Сумма ' + total
-
 
     def save(self, newfile=None):
         if newfile is None:
@@ -44,8 +45,16 @@ class WordTemplate:
         else:
             self.doc.save(newfile)
 
-    def generate_rows(self,obj):
-        pass
+    def generate_rows(self, params: list):
+        self.main_table.add_rows()
+        self.rows += 1
+        new_row = self.main_table.rows[self.rows]
+        pos = new_row.cells[0]
+        name = new_row.cells[1]
+        deltime = new_row.cells[3]
+        price = new_row.cells[4]
+        total = new_row.cells[5]
+
 
 
 class ExcelParse:
