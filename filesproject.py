@@ -67,11 +67,16 @@ class ExcelParse:
     sheet = openpyxl.load_workbook('data.xlsx')
     worksheet = sheet["Actual"]
     print(worksheet.max_column)
-    for k in range(worksheet.max_row):
-
-        for i in range(worksheet.max_column):
-            resultdict[worksheet.cell(row=1, column = i+1).value] = worksheet.cell(row = k+1, column = i+1).value
-        resultlist.append(resultdict)
+    basic = []
+    basic_cols = [1,2,3,12,13,14,15,16,17,18]
+    for i in basic_cols:
+        basic.append(worksheet.cell(row=1, column = i).value)
+    print(basic)
+    # for k in range(worksheet.max_row):
+    #
+    #     for i in range(worksheet.max_column):
+    #         resultdict[worksheet.cell(row=1, column = i+1).value] = worksheet.cell(row = k+1, column = i+1).value
+    #     resultlist.append(resultdict)
 
     print(resultlist)
 
