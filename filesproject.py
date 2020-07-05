@@ -7,12 +7,13 @@ class WordTemplate:
     for next activity"""
 
     def __init__(self, filename):
-        self.filename = filename
-        self.doc = docx.Document(self.filename)
-        self.offer_num = self.doc.tables[1].rows[0].cells[0]
-        self.customer_name = self.doc.tables[1].rows[0].cells[2]
-        self.main_table = self.doc.tables[2]
-        self.rows = 0
+        """Конструктор, сразу инициализирует переменные"""
+        self.filename = filename  # название открываемого файла
+        self.doc = docx.Document(self.filename)  # открывает докх документ
+        self.offer_num = self.doc.tables[1].rows[0].cells[0]  # место где находится номер ТКП
+        self.customer_name = self.doc.tables[1].rows[0].cells[2]  #  место, где находится имя клиента
+        self.main_table = self.doc.tables[2]  # основная таблица
+        self.rows = 0  #переменная - номер строки, по умолчанию ноль, как только создается строка - +1
         self.offer_head = self.doc.tables[2].rows[0]
         self.pos_head = self.offer_head.cells[0].text
         self.name_head = self.offer_head.cells[1].text
@@ -61,13 +62,26 @@ class ExcelParse:
     """
     Class for parsing excel File, each row - parameters for the filling word table
     """
-    pass
+    resultdict = {}
+    resultlist = []
+    sheet = openpyxl.load_workbook('data.xlsx')
+    worksheet = sheet["Actual"]
+    print(worksheet.max_column)
+    for k in range(worksheet.max_row):
+
+        for i in range(worksheet.max_column):
+            resultdict[worksheet.cell(row=1, column = i+1).value] = worksheet.cell(row = k+1, column = i+1).value
+        resultlist.append(resultdict)
+
+    print(resultlist)
 
 
 def main():
-    newdoc = WordTemplate('testoff.docx')
-    newdoc.create_head('N05jkl05', 'ТАhjkИФ')
-    newdoc.save()
+    # newdoc = WordTemplate('testoff.docx')
+    # newdoc.create_head('N05jkl05', 'ТАhjkИФ')
+    # newdoc.save()
+    newex = ExcelParse()
+
     """
     doc = open_doc('testoff.docx')
     offer_num = doc.tables[1].rows[0].cells[0].text
