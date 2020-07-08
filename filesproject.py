@@ -1,5 +1,6 @@
 import docx
 import openpyxl
+import datetime
 
 
 class WordTemplate:
@@ -22,15 +23,18 @@ class WordTemplate:
         self.price_head = self.offer_head.cells[4].text
         self.total_head = self.offer_head.cells[5].text
 
-    def create_head(self, offer_num: str, customer_name: str):
+    def create_main(self):
         """
-        Filling head of table
+        Заполнение констант ТКП
         :param offer_num: string
         :param customer_name: string
         """
-        self.offer_num.text = offer_num
-        self.customer_name.text = customer_name
+        head_dict = ExcelParse().header()
+        number = str(head_dict['Дата'])[:10] #TODO разобрать дату и преобразовать в номер
 
+        self.offer_num.text = '№ '+head_dict['Имя ТКП']+' '+str(head_dict['Дата'])[:10] # TODO номер+дата
+        self.customer_name.text = head_dict['Заказчик']
+        # TODO - отцентровать по середине ячейки и посмотреть шрифты покрасивей
     def create_prices(self, price="(без НДС), евро", total='(без НДС), евро'):
         """
         Filling head of table
@@ -62,30 +66,49 @@ class ExcelParse:
     """
     Class for parsing excel File, each row - parameters for the filling word table
     """
-    resultdict = {}
-    resultlist = []
-    sheet = openpyxl.load_workbook('data.xlsx')
-    worksheet = sheet["Actual"]
-    print(worksheet.max_column)
-    basic = []
-    basic_cols = [1,2,3,12,13,14,15,16,17,18]
-    for i in basic_cols:
-        basic.append(worksheet.cell(row=1, column = i).value)
-    print(basic)
-    # for k in range(worksheet.max_row):
-    #
-    #     for i in range(worksheet.max_column):
-    #         resultdict[worksheet.cell(row=1, column = i+1).value] = worksheet.cell(row = k+1, column = i+1).value
-    #     resultlist.append(resultdict)
 
-    print(resultlist)
+    def __init__(self):
+        self.resultdict = {}
+        resultlist = []
+        sheet = openpyxl.load_workbook('data.xlsx')
+        self.worksheet = sheet["Actual"]
+        print(self.worksheet.max_column)
+        self.basic_head = {}
+
+
+    def header(self):
+        """Считывание основных данных для заполнения ТКП,
+        читаем колонки
+        1-Дата; 2-Заказчик; 3-Имя ТКп; 12-Сумма; 13-Тип цены
+        14 - тип суммы
+        15- условия оплаты
+        16 - условия доставки
+        17-Документация
+        18 - Куратор
+        """
+        self.basic_cols = [1, 2, 3, 13, 14, 15, 16, 17, 18]
+        for i in self.basic_cols:
+            self.basic_head[i]=self.worksheet.cell(row=1, column = i).value
+            self.resultdict[self.basic_head[i]] = self.worksheet.cell(row=2, column=i).value
+        print(self.resultdict)
+
+        return self.resultdict
+    # for k in range(2, worksheet.max_row):
+    #
+    #     for i in basic_cols:
+    #         print(i)
+
+
+        # resultlist.append(resultdict)
+
 
 
 def main():
-    # newdoc = WordTemplate('testoff.docx')
-    # newdoc.create_head('N05jkl05', 'ТАhjkИФ')
-    # newdoc.save()
-    newex = ExcelParse()
+    newdoc = WordTemplate('testoff.docx')
+    newdoc.create_main()
+    newdoc.save()
+    # newex = ExcelParse()
+    # newex.header()
 
     """
     doc = open_doc('testoff.docx')
