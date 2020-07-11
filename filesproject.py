@@ -1,6 +1,6 @@
 import docx
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 import openpyxl
-import datetime
 
 
 class WordTemplate:
@@ -12,16 +12,16 @@ class WordTemplate:
         self.filename = filename  # название открываемого файла
         self.doc = docx.Document(self.filename)  # открывает докх документ
         self.offer_num = self.doc.tables[1].rows[0].cells[0]  # место где находится номер ТКП
-        self.customer_name = self.doc.tables[1].rows[0].cells[2]  #  место, где находится имя клиента
+        self.customer_name = self.doc.tables[1].rows[0].cells[2]  # место, где находится имя клиента
         self.main_table = self.doc.tables[2]  # основная таблица
-        self.rows = 0  #переменная - номер строки, по умолчанию ноль, как только создается строка - +1
+        self.rows = 0  # переменная - номер строки, по умолчанию ноль, как только создается строка - +1
         self.offer_head = self.doc.tables[2].rows[0]
         self.pos_head = self.offer_head.cells[0].text
         self.name_head = self.offer_head.cells[1].text
         self.qnt_head = self.offer_head.cells[2].text
         self.deltime_head = self.offer_head.cells[3].text
-        self.price_head = self.offer_head.cells[4].text
-        self.total_head = self.offer_head.cells[5].text
+        self.price_head = self.offer_head.cells[4]
+        self.total_head = self.offer_head.cells[5]
 
     def create_main(self):
         """
@@ -30,11 +30,33 @@ class WordTemplate:
         :param customer_name: string
         """
         head_dict = ExcelParse().header()
-        number = str(head_dict['Дата'])[:10] #TODO разобрать дату и преобразовать в номер
-
-        self.offer_num.text = '№ '+head_dict['Имя ТКП']+' '+str(head_dict['Дата'])[:10] # TODO номер+дата
+        """ Заполнение и центрование даты"""
+        number = str(head_dict['Дата'])[8:10] + \
+                 str(head_dict['Дата'])[5:7] + \
+                 '-' + str(head_dict['Дата'])[2:4]
+        date_of = ' от ' + str(head_dict['Дата'])[8:10] + '.' + \
+                  str(head_dict['Дата'])[5:7] + '.' + \
+                  str(head_dict['Дата'])[0:4] + ' г.'
+        self.offer_num.text = '№ ' + head_dict['Имя ТКП'] + number + date_of
+        self.aligment_cell(self.offer_num)
+        # offer_num_paragraph = self.offer_num.paragraphs[0]
+        # offer_num_paragraph.text = self.offer_num.text
+        # offer_num_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        """Заполнение и центрование Заказчика"""
         self.customer_name.text = head_dict['Заказчик']
-        # TODO - отцентровать по середине ячейки и посмотреть шрифты покрасивей
+        self.aligment_cell(self.customer_name)
+
+        """ЦЕны"""
+
+        self.price_head.text = 'Цена ' + head_dict['Цена']
+        self.total_head.text = 'Сумма ' + head_dict['Сумма']
+
+    @staticmethod
+    def aligment_cell(field):
+        field_paragraph = field.paragraphs[0]
+        field_paragraph.text = field.text
+        field_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
     def create_prices(self, price="(без НДС), евро", total='(без НДС), евро'):
         """
         Filling head of table
@@ -61,7 +83,6 @@ class WordTemplate:
         total = new_row.cells[5]
 
 
-
 class ExcelParse:
     """
     Class for parsing excel File, each row - parameters for the filling word table
@@ -75,7 +96,6 @@ class ExcelParse:
         print(self.offer_data.max_column)
         self.basic_head = {}
 
-
     def header(self):
         """Считывание основных данных для заполнения ТКП,
         читаем колонки
@@ -88,7 +108,7 @@ class ExcelParse:
         """
         self.basic_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for i in self.basic_cols:
-            self.basic_head[i]=self.offer_data.cell(row=1, column = i).value
+            self.basic_head[i] = self.offer_data.cell(row=1, column=i).value
             self.resultdict[self.basic_head[i]] = self.offer_data.cell(row=2, column=i).value
         print(self.resultdict)
 
@@ -98,9 +118,7 @@ class ExcelParse:
     #     for i in basic_cols:
     #         print(i)
 
-
-        # resultlist.append(resultdict)
-
+    # resultlist.append(resultdict)
 
 
 def main():
