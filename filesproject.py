@@ -71,25 +71,25 @@ class ExcelParse:
         self.resultdict = {}
         resultlist = []
         sheet = openpyxl.load_workbook('data.xlsx')
-        self.worksheet = sheet["Actual"]
-        print(self.worksheet.max_column)
+        self.offer_data = sheet["Actual"]
+        print(self.offer_data.max_column)
         self.basic_head = {}
 
 
     def header(self):
         """Считывание основных данных для заполнения ТКП,
         читаем колонки
-        1-Дата; 2-Заказчик; 3-Имя ТКп; 12-Сумма; 13-Тип цены
-        14 - тип суммы
-        15- условия оплаты
-        16 - условия доставки
-        17-Документация
-        18 - Куратор
+        1-Дата; 2-Заказчик; 3-Имя ТКп; 4-Тип цены
+        5 - тип суммы
+        6- условия оплаты
+        7 - условия доставки
+        8-Документация
+        9 - Куратор
         """
-        self.basic_cols = [1, 2, 3, 13, 14, 15, 16, 17, 18]
+        self.basic_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for i in self.basic_cols:
-            self.basic_head[i]=self.worksheet.cell(row=1, column = i).value
-            self.resultdict[self.basic_head[i]] = self.worksheet.cell(row=2, column=i).value
+            self.basic_head[i]=self.offer_data.cell(row=1, column = i).value
+            self.resultdict[self.basic_head[i]] = self.offer_data.cell(row=2, column=i).value
         print(self.resultdict)
 
         return self.resultdict
