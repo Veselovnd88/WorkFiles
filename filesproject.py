@@ -47,24 +47,17 @@ class WordTemplate:
         self.aligment_cell(self.customer_name)
 
         """ЦЕны"""
-
         self.price_head.text = 'Цена ' + head_dict['Цена']
+        self.aligment_cell(self.price_head)
         self.total_head.text = 'Сумма ' + head_dict['Сумма']
+        self.aligment_cell(self.total_head)
 
     @staticmethod
     def aligment_cell(field):
+        """Вырванивает по центру"""
         field_paragraph = field.paragraphs[0]
         field_paragraph.text = field.text
         field_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-    def create_prices(self, price="(без НДС), евро", total='(без НДС), евро'):
-        """
-        Filling head of table
-        :param price: str
-        :param total: str
-        """
-        self.price_head.text = 'Цена ' + price
-        self.total_head = 'Сумма ' + total
 
     def save(self, newfile=None):
         if newfile is None:
