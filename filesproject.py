@@ -1,5 +1,5 @@
 import docx
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 import openpyxl
 
 
@@ -57,7 +57,7 @@ class WordTemplate:
         """Вырванивает по центру"""
         field_paragraph = field.paragraphs[0]
         field_paragraph.text = field.text
-        field_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        field_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
     def save(self, newfile=None):
         if newfile is None:
