@@ -82,12 +82,17 @@ class ExcelParse:
     """
 
     def __init__(self):
-        self.resultdict = {}
-        resultlist = []
+        self.basic_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.main_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.head_dict = {}
+        self.main_dict = {}
+        self.mainlst = []
         sheet = openpyxl.load_workbook('data.xlsx')
         self.offer_data = sheet["Actual"]
+        self.rows_data = sheet['Technic']
         print(self.offer_data.max_column)
-        self.basic_head = {}
+        self.basic_head = {}  # заголовок Актуал
+        self.basic_main = {}  # заголовок Техник
 
     def header(self):
         """Считывание основных данных для заполнения ТКП,
@@ -99,27 +104,38 @@ class ExcelParse:
         8-Документация
         9 - Куратор
         """
-        self.basic_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for i in self.basic_cols:
-            self.basic_head[i] = self.offer_data.cell(row=1, column=i).value
-            self.resultdict[self.basic_head[i]] = self.offer_data.cell(row=2, column=i).value
-        print(self.resultdict)
+            self.basic_head[i] = self.offer_data.cell(row=1, column=i).value  # заполнение заголовка
+            self.head_dict[self.basic_head[i]] = self.offer_data.cell(row=2, column=i).value  # значения
+        print(self.head_dict)
 
-        return self.resultdict
-    # for k in range(2, worksheet.max_row):
-    #
-    #     for i in basic_cols:
-    #         print(i)
+        return self.head_dict
 
-    # resultlist.append(resultdict)
+
+
+    def rows(self):
+        for k in range(self.rows_data.max_row):
+            self.main_dict = {}
+            if self.rows_data.cell(row=k + 2, column=1).value is None:
+                break
+            for i in self.main_cols:
+                self.basic_main[i] = self.rows_data.cell(row=1, column=i).value
+
+                self.main_dict[self.basic_main[i]] = self.rows_data.cell(row=k+2, column=i).value
+
+            print(self.main_dict)
+            self.mainlst.append(self.main_dict)
+        print(self.mainlst)
+        return self.mainlst
+        # return self.main_dict
 
 
 def main():
-    newdoc = WordTemplate('testoff.docx')
-    newdoc.create_main()
-    newdoc.save()
-    # newex = ExcelParse()
-    # newex.header()
+    # newdoc = WordTemplate('testoff.docx')
+    # newdoc.create_main()
+    # newdoc.save()
+    newex = ExcelParse()
+    newex.rows()
 
     """
     doc = open_doc('testoff.docx')
