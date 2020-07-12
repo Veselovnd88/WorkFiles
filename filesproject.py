@@ -66,14 +66,17 @@ class WordTemplate:
             self.doc.save(newfile)
 
     def generate_rows(self, params: list):
-        self.main_table.add_rows()
-        self.rows += 1
-        new_row = self.main_table.rows[self.rows]
-        pos = new_row.cells[0]
-        name = new_row.cells[1]
-        deltime = new_row.cells[3]
-        price = new_row.cells[4]
-        total = new_row.cells[5]
+
+        for i in params:
+            self.main_table.add_rows()
+            self.rows += 1
+            new_row = self.main_table.rows[self.rows]
+            pos = new_row.cells[0]
+            pos.text = i['№ поз.']
+            name = new_row.cells[1]
+            deltime = new_row.cells[3]
+            price = new_row.cells[4]
+            total = new_row.cells[5]
 
 
 class ExcelParse:
@@ -131,9 +134,10 @@ class ExcelParse:
 
 
 def main():
-    # newdoc = WordTemplate('testoff.docx')
-    # newdoc.create_main()
-    # newdoc.save()
+    newdoc = WordTemplate('testoff.docx')
+    newdoc.create_main()
+    newdoc.generate_rows(ExcelParse.rows())
+    newdoc.save()
     newex = ExcelParse()
     newex.rows()
 
