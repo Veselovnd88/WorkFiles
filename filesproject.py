@@ -23,6 +23,12 @@ class WordTemplate:
         self.price_head = self.offer_head.cells[4]
         self.total_head = self.offer_head.cells[5]
 
+    def check_par(self):
+        k=0
+        for i in range(1,len(self.doc.paragraphs)):
+            print(k, self.doc.paragraphs[i].text)
+            k+=1
+
     def create_main(self):
         """
         Заполнение констант ТКП
@@ -144,8 +150,9 @@ class ExcelParse:
 
 def main():
     newdoc = WordTemplate('testoff.docx')
-    newdoc.create_main()
-    newdoc.generate_rows(ExcelParse().rows())
+    # newdoc.create_main()
+    # newdoc.generate_rows(ExcelParse().rows())
+    newdoc.check_par()
     newdoc.save()
     # newex = ExcelParse()
     # newex.rows()
