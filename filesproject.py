@@ -26,13 +26,10 @@ class WordTemplate:
     def create_main(self):
         """
         Заполнение констант ТКП
-        :param offer_num: string
-        :param customer_name: string
         """
         head_dict = ExcelParse().header()
         """ Заполнение и центрование даты"""
-        number = str(head_dict['Дата'])[8:10] + \
-                 str(head_dict['Дата'])[5:7] + \
+        number = str(head_dict['Дата'])[8:10] + str(head_dict['Дата'])[5:7] + \
                  '-' + str(head_dict['Дата'])[2:4]
         date_of = ' от ' + str(head_dict['Дата'])[8:10] + '.' + \
                   str(head_dict['Дата'])[5:7] + '.' + \
@@ -66,17 +63,31 @@ class WordTemplate:
             self.doc.save(newfile)
 
     def generate_rows(self, params: list):
-
+        print('Params', params)
         for i in params:
-            self.main_table.add_rows()
+            self.main_table.add_row()
             self.rows += 1
             new_row = self.main_table.rows[self.rows]
             pos = new_row.cells[0]
-            pos.text = i['№ поз.']
-            name = new_row.cells[1]
-            deltime = new_row.cells[3]
-            price = new_row.cells[4]
-            total = new_row.cells[5]
+            pos.text = str(i['№ поз.'])  # Номер позиции
+            name = new_row.cells[1]  # Переход в ячейку с наименованием
+            name_fill = i['Брэнд'] + '\n' + i['Наименование поз.'] + ' ' + i['Брэнд'] + '. ' + 'Модель ' + \
+                        i['Модель'] + \
+                        '. ' + i['Кодировка'] + '\n' + i['Расшифровка']
+            name.text = name_fill
+            qnt = i['Кол-во, шт.']
+            new_row.cells[2].text = str(qnt)
+            self.aligment_cell(new_row.cells[2])
+            deltime = i['Срок поставки']
+            new_row.cells[3].text = deltime
+            self.aligment_cell(new_row.cells[3])
+            price = '%0.2f' % (i['Цена (цифры)'])
+
+            new_row.cells[4].text = str(price).replace('.', ',')
+            self.aligment_cell(new_row.cells[4])
+            total = '%0.2f' % i['Сумма (цифры)']
+            new_row.cells[5].text = str(total).replace('.', ',')
+            self.aligment_cell(new_row.cells[5])
 
 
 class ExcelParse:
@@ -85,12 +96,12 @@ class ExcelParse:
     """
 
     def __init__(self):
-        self.basic_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        self.main_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.basic_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]  # Вкладка Actual
+        self.main_cols = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12]  # Вкладка Technic
         self.head_dict = {}
         self.main_dict = {}
         self.mainlst = []
-        sheet = openpyxl.load_workbook('data.xlsx')
+        sheet = openpyxl.load_workbook('data.xlsx', data_only=True)
         self.offer_data = sheet["Actual"]
         self.rows_data = sheet['Technic']
         print(self.offer_data.max_column)
@@ -110,11 +121,9 @@ class ExcelParse:
         for i in self.basic_cols:
             self.basic_head[i] = self.offer_data.cell(row=1, column=i).value  # заполнение заголовка
             self.head_dict[self.basic_head[i]] = self.offer_data.cell(row=2, column=i).value  # значения
-        print(self.head_dict)
+        #  print(self.head_dict)
 
         return self.head_dict
-
-
 
     def rows(self):
         for k in range(self.rows_data.max_row):
@@ -124,11 +133,11 @@ class ExcelParse:
             for i in self.main_cols:
                 self.basic_main[i] = self.rows_data.cell(row=1, column=i).value
 
-                self.main_dict[self.basic_main[i]] = self.rows_data.cell(row=k+2, column=i).value
+                self.main_dict[self.basic_main[i]] = self.rows_data.cell(row=k + 2, column=i).value
 
-            print(self.main_dict)
+            #  print(self.main_dict)
             self.mainlst.append(self.main_dict)
-        print(self.mainlst)
+        #  print(self.mainlst)
         return self.mainlst
         # return self.main_dict
 
@@ -136,10 +145,10 @@ class ExcelParse:
 def main():
     newdoc = WordTemplate('testoff.docx')
     newdoc.create_main()
-    newdoc.generate_rows(ExcelParse.rows())
+    newdoc.generate_rows(ExcelParse().rows())
     newdoc.save()
-    newex = ExcelParse()
-    newex.rows()
+    # newex = ExcelParse()
+    # newex.rows()
 
     """
     doc = open_doc('testoff.docx')
