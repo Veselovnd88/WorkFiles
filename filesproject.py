@@ -1,5 +1,7 @@
 import docx
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.shared import Pt
+import docx.shared
 import openpyxl
 
 
@@ -23,13 +25,6 @@ class WordTemplate:
         self.price_head = self.offer_head.cells[4]
         self.total_head = self.offer_head.cells[5]
 
-    def check_par(self):
-        k = 0
-        # for i in range(1,len(self.doc.paragraphs)):
-        #     print(k, self.doc.paragraphs[i].text)
-        #     k+=1
-        print(self.doc.paragraphs[7].text)
-
     def create_main(self):
         """
         Заполнение констант ТКП
@@ -43,9 +38,7 @@ class WordTemplate:
                   str(head_dict['Дата'])[0:4] + ' г.'
         self.offer_num.text = '№ ' + head_dict['Имя ТКП'] + number + date_of
         self.aligment_cell(self.offer_num)
-        # offer_num_paragraph = self.offer_num.paragraphs[0]
-        # offer_num_paragraph.text = self.offer_num.text
-        # offer_num_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
         """Заполнение и центрование Заказчика"""
         self.customer_name.text = head_dict['Заказчик']
         self.aligment_cell(self.customer_name)
@@ -66,14 +59,19 @@ class WordTemplate:
         self.doc.add_paragraph(head_dict['Условия доставки'])
         self.doc.add_paragraph('Документация:')
         self.doc.paragraphs[11].runs[0].bold = True
-        self.doc.add_paragraph(head_dict['Документация'])
-        self.doc.add_paragraph('Исполнитель:')
-        self.doc.add_paragraph(head_dict['Куратор'])
+        self.doc.add_paragraph(head_dict['Документация'] + '\n')
 
+        self.doc.add_paragraph('Исполнитель:')
+        self.doc.paragraphs[13].runs[0].font.size = Pt(10)  # Размер шрифта
+        self.doc.paragraphs[13].runs[0].bold = True  # Жирный шрифт
+        self.doc.add_paragraph(head_dict['Куратор'])
+        self.doc.paragraphs[14].runs[0].font.size = Pt(10)
         self.doc.add_paragraph('+7 (495) 921 30 12 доб.' + self.addnum(head_dict))
+        self.doc.paragraphs[15].runs[0].font.size = Pt(10)
 
     @staticmethod
     def addnum(head_dict):
+        """ Добавочный номер телефона в зависимости от фамилии"""
         if head_dict['Куратор'] == 'Веселов Н.Д.':
             return '1025'
         elif head_dict['Куратор'] == 'Казаков Д.В.':
@@ -178,26 +176,9 @@ def main():
     newdoc = WordTemplate('testoff.docx')
     newdoc.create_main()
     # newdoc.generate_rows(ExcelParse().rows())
-    newdoc.check_par()
     newdoc.save()
     # newex = ExcelParse()
     # newex.rows()
-
-    """
-    doc = open_doc('testoff.docx')
-    offer_num = doc.tables[1].rows[0].cells[0].text
-    customer_name = doc.tables[1].rows[0].cells[2].text
-    offer_head = doc.tables[2].rows[0]
-    pos_head = offer_head.cells[0].text
-    name_head = offer_head.cells[1].text
-    qnt_head = offer_head.cells[2].text
-    deltime_head = offer_head.cells[3].text
-    price_head = offer_head.cells[4].text
-    total_head = offer_head.cells[5].text
-    doc.tables[2].add_row()
-
-    doc.save('testoff.docx')
-"""
 
 
 if __name__ == '__main__':
