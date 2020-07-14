@@ -24,10 +24,11 @@ class WordTemplate:
         self.total_head = self.offer_head.cells[5]
 
     def check_par(self):
-        k=0
-        for i in range(1,len(self.doc.paragraphs)):
-            print(k, self.doc.paragraphs[i].text)
-            k+=1
+        k = 0
+        # for i in range(1,len(self.doc.paragraphs)):
+        #     print(k, self.doc.paragraphs[i].text)
+        #     k+=1
+        print(self.doc.paragraphs[7].text)
 
     def create_main(self):
         """
@@ -54,6 +55,31 @@ class WordTemplate:
         self.aligment_cell(self.price_head)
         self.total_head.text = 'Сумма ' + head_dict['Сумма']
         self.aligment_cell(self.total_head)
+
+        """ Условия поставки"""
+        self.doc.paragraphs[7].text = 'Условия оплаты:'
+        self.doc.paragraphs[7].runs[0].bold = True
+
+        self.doc.add_paragraph(head_dict['Условия оплаты'])
+        self.doc.add_paragraph('Условия доставки:')
+        self.doc.paragraphs[9].runs[0].bold = True
+        self.doc.add_paragraph(head_dict['Условия доставки'])
+        self.doc.add_paragraph('Документация:')
+        self.doc.paragraphs[11].runs[0].bold = True
+        self.doc.add_paragraph(head_dict['Документация'])
+        self.doc.add_paragraph('Исполнитель:')
+        self.doc.add_paragraph(head_dict['Куратор'])
+
+        self.doc.add_paragraph('+7 (495) 921 30 12 доб.' + self.addnum(head_dict))
+
+    @staticmethod
+    def addnum(head_dict):
+        if head_dict['Куратор'] == 'Веселов Н.Д.':
+            return '1025'
+        elif head_dict['Куратор'] == 'Казаков Д.В.':
+            return '1026'
+        elif head_dict['Куратор'] == 'Бондарцев М.А.':
+            return '1027'
 
     @staticmethod
     def aligment_cell(field):
@@ -127,7 +153,7 @@ class ExcelParse:
         for i in self.basic_cols:
             self.basic_head[i] = self.offer_data.cell(row=1, column=i).value  # заполнение заголовка
             self.head_dict[self.basic_head[i]] = self.offer_data.cell(row=2, column=i).value  # значения
-        #  print(self.head_dict)
+        print(self.head_dict)
 
         return self.head_dict
 
@@ -143,14 +169,14 @@ class ExcelParse:
 
             #  print(self.main_dict)
             self.mainlst.append(self.main_dict)
-        #  print(self.mainlst)
+        print(self.mainlst)
         return self.mainlst
         # return self.main_dict
 
 
 def main():
     newdoc = WordTemplate('testoff.docx')
-    # newdoc.create_main()
+    newdoc.create_main()
     # newdoc.generate_rows(ExcelParse().rows())
     newdoc.check_par()
     newdoc.save()
