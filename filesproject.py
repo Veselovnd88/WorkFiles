@@ -102,8 +102,8 @@ class WordTemplate:
             pos.text = str(i['№ поз.'])  # Номер позиции
             name = new_row.cells[1]  # Переход в ячейку с наименованием
             name_fill = i['Брэнд'] + '\n' + i['Наименование поз.'] + ' ' + i['Брэнд'] + '. ' + 'Модель ' + \
-                        i['Модель'] + \
-                        '. ' + i['Кодировка'] + '\n' + i['Расшифровка']
+                        i['Модель'] +'. ' + \
+                         i['Кодировка'] + '\n' + i['Расшифровка']
             name.text = name_fill
             qnt = i['Кол-во, шт.']
             new_row.cells[2].text = str(qnt)
@@ -162,8 +162,10 @@ class ExcelParse:
                 break
             for i in self.main_cols:
                 self.basic_main[i] = self.rows_data.cell(row=1, column=i).value
-
-                self.main_dict[self.basic_main[i]] = self.rows_data.cell(row=k + 2, column=i).value
+                if self.rows_data.cell(row=k + 2, column=i).value is None:
+                    self.main_dict[self.basic_main[i]] = ''
+                else:
+                    self.main_dict[self.basic_main[i]] = self.rows_data.cell(row=k + 2, column=i).value
 
             #  print(self.main_dict)
             self.mainlst.append(self.main_dict)
@@ -175,7 +177,7 @@ class ExcelParse:
 def main():
     newdoc = WordTemplate('testoff.docx')
     newdoc.create_main()
-    # newdoc.generate_rows(ExcelParse().rows())
+    newdoc.generate_rows(ExcelParse().rows())
     newdoc.save()
     # newex = ExcelParse()
     # newex.rows()
